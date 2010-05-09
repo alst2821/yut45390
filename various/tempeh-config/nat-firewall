@@ -1,0 +1,71 @@
+#!/bin/bash
+
+#
+# nat-firewall  This shell script takes care of starting and stopping
+#               the nat ppp0 connection sharing over eth0
+#
+# chkconfig: - 64 36
+# description: nat-firewall starts/stops the nat ppp0 connection sharing 
+
+#
+#  crude nat connection sharing + firewall (?)
+#  from http://www.linux-usb.org/SpeedTouch/games-consoles/index.html  
+#  Assumes linux machine (this host) sharing its ppp0 connection over
+#  its eth0 interface (192.168.0.1)
+#  The guest machine is 192.168.0.2
+
+# chkconfig: - 64 37
+
+#
+# load modules
+#
+load_modules() {
+    /sbin/modprobe ip_tables
+    /sbin/modprobe iptable_filter
+    /sbin/modprobe ip_conntrack
+    /sbin/modprobe ip_conntrack_ftp
+    /sbin/modprobe ipt_state
+    /sbin/modprobe iptable_nat
+    /sbin/modprobe ip_nat_ftp
+    /sbin/modprobe ipt_MASQUERADE
+    /sbin/modprobe ipt_REJECT
+}
+#
+#
+load_tables() {
+    /sbin/iptables -P OUTPUT ACCEPT
+    /sbin/iptables -P FORWARD DROP
+    /sbin/iptables -P INPUT DROP
+    /sbin/iptables -A INPUT -i lo -j ACCEPT
+    /sbin/iptables -t nat -A POSTROUTING -o ppp0 -s 192.168.0.2/24 -j MASQUERADE
+    /sbin/iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+    /sbin/iptables -A FORWARD -i ppp0 -o ppp0 -j DROP
+    /sbin/iptables -A FORWARD -i ppp0 -o eth0 -j ACCEPT
+    /sbin/iptables -A FORWARD -i eth0 -o ppp0 -j ACCEPT
+    /sbin/iptables -A INPUT -s 192.168.0.0/24 -j ACCEPT
+    # ssh from sevapc30
+    /sbin/iptables -A INPUT -p tcp -s 163.1.15.88/29 --dport 22 -m state --state NEW,ESTABLISHED -j ACCEPT
+    /sbin/iptables -A OUTPUT -p tcp -d 163.1.15.88/29 --sport 22 -m state --state ESTABLISHED -j ACCEPT
+    /sbin/ifconfig eth0 192.168.0.1 netmask 255.255.255.0
+    /sbin/route add -net 192.168.0.0 netmask 255.255.255.0 dev eth0
+    echo 1 > /proc/sys/net/ipv4/ip_forward
+}
+
+
+case "$1" in 
+  start)
+      load_modules
+      load_tables
+      ;;
+  stop)
+      /etc/init.d/iptables stop
+      /sbin/route del -net 192.168.0.0/24
+      ;;
+  *)
+      echo $"Usage: $0 {start|stop}"
+      exit 1
+      ;;
+esac
+
+exit 0
+

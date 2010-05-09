@@ -1,0 +1,5 @@
+git remote -v show
+assembla	git@git.assembla.com:yut45390 (fetch)
+assembla	git@git.assembla.com:yut45390 (push)
+origin	git@github.com:yut45390/Music.git (fetch)
+origin	git@github.com:yut45390/Music.git (push)

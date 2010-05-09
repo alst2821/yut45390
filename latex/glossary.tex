@@ -1,0 +1,37 @@
+\documentclass{article}
+
+%%
+% Simple glossary environment
+%
+% To use:
+%  \begin{simpleglossary}
+%    \entry{name}{description}
+%    \entry{name}{description}
+%    \entry{name}{description}
+%  \end{simpleglossary}
+\newenvironment{simpleglossary}%
+{%
+\renewcommand{\arraystretch}{2.5}%
+\renewcommand{\tabcolsep}{0.2cm}%
+\begin{tabular}{ l  p{8cm}}}%
+{\end{tabular}}
+\newcommand{\entry}[2]{\bf{#1} & #2 \\}
+
+\begin{document}
+
+\section*{Glossary}
+
+\begin{simpleglossary}
+\entry{DC}{Distributed Clocks}
+\entry{CoE}{CANopen over EtherCAT}
+\entry{EoE}{Ethernet over EtherCAT}
+\entry{VoE}{Vendor-specific over EtherCAT}
+
+\entry{FMMU}{Process Data Object}
+\entry{PDO}{Process Data Object}
+\entry{SDO}{Slave Data Object}
+\entry{SII}{Slave Information Interface}
+\entry{AL State}{Application Layer}
+\end{simpleglossary}
+
+\end{document}

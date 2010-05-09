@@ -1,0 +1,28 @@
+
+Plotter program
+
+invocation:
+
+java -jar plotter.jar
+
+Listens on port 7070 for incoming UDP packets with the following format:
+Byte Use
+0    16-bit sequenceno (msb)
+1    16-bit sequenceno (lsb)
+2-4    three bytes for 24-bit value (1 of 32)
+5-97   three bytes * 32 for 24-bit values (2 to 32 of 32)
+98-254 padding
+
+The plots show the values of a selectable 24-bit conversion scaled from
+0 to 16777215 (24 bits) and displayed as percentage of 16777215 (0 to 100%).
+
+Testing program
+===============
+
+java -cp plotter.jar ox.net.udpsend.simulator.Generator
+
+Generates udp packets to test plotting program. Sends 700 packets with a "V" shape
+from 0 to the maximum for channel 1 (value 1 of 32).
+
+
+
